@@ -235,6 +235,7 @@ public class SpringApplication {
 	 * 资源加载器
 	 */
 	private ResourceLoader resourceLoader;
+
 	/**
 	 * 主要的 Java Config 类的数组
 	 */
@@ -244,11 +245,11 @@ public class SpringApplication {
 	 * ApplicationContextInitializer 数组
 	 */
 	private List<ApplicationContextInitializer<?>> initializers;
+
 	/**
 	 * 监听器数组
 	 */
 	private List<ApplicationListener<?>> listeners;
-
 
 	/**
 	 * Create a new {@link SpringApplication} instance. The application context will load
@@ -271,9 +272,6 @@ public class SpringApplication {
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
-
-
-
 	/**
 	 * Create a new {@link SpringApplication} instance. The application context will load
 	 * beans from the specified primary sources (see {@link SpringApplication class-level}
@@ -287,8 +285,6 @@ public class SpringApplication {
 	public SpringApplication(Class<?>... primarySources) {
 		this(null, primarySources);
 	}
-
-
 
 	private Class<?> deduceMainApplicationClass() {
 		try {
@@ -311,9 +307,9 @@ public class SpringApplication {
 	 * @param args the application arguments (usually passed from a Java main method)
 	 * @return a running {@link ApplicationContext}
 	 */
-	public ConfigurableApplicationContext run(String... args) { //正面硬刚
+	public ConfigurableApplicationContext run(String... args) { // 正面硬刚
 		/**
-		 *  <1> 创建 StopWatch 对象，并启动。StopWatch 主要用于简单统计 run 启动过程的时长。
+		 * <1> 创建 StopWatch 对象，并启动。StopWatch 主要用于简单统计 run 启动过程的时长。
 		 */
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -331,11 +327,12 @@ public class SpringApplication {
 		listeners.starting();
 		try {
 			/**
-			 * <4> 创建  ApplicationArguments 对象
+			 * <4> 创建 ApplicationArguments 对象
 			 */
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 			/**
-			 * <5> 加载属性配置。执行完成后，所有的 environment 的属性都会加载进来，包括 application.properties 和外部的属性配置。
+			 * <5> 加载属性配置。执行完成后，所有的 environment 的属性都会加载进来，包括 application.properties
+			 * 和外部的属性配置。
 			 */
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			configureIgnoreBeanInfo(environment);
@@ -407,14 +404,16 @@ public class SpringApplication {
 		return context;
 	}
 
-	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments) {
+	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
+			ApplicationArguments applicationArguments) {
 		// Create and configure the environment
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		listeners.environmentPrepared(environment);
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
-			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
+			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
+					deduceEnvironmentClass());
 		}
 		ConfigurationPropertySources.attach(environment);
 		return environment;
