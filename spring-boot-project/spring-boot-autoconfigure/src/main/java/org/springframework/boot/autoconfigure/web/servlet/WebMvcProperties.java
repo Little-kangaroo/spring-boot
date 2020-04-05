@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.validation.DefaultMessageCodesResolver;
@@ -86,6 +87,12 @@ public class WebMvcProperties {
 	 * process a request.
 	 */
 	private boolean throwExceptionIfNoHandlerFound = false;
+
+	/**
+	 * Whether logging of (potentially sensitive) request details at DEBUG and TRACE level
+	 * is allowed.
+	 */
+	private boolean logRequestDetails;
 
 	/**
 	 * Whether to enable warn logging of exceptions resolved by a
@@ -164,6 +171,14 @@ public class WebMvcProperties {
 		this.throwExceptionIfNoHandlerFound = throwExceptionIfNoHandlerFound;
 	}
 
+	public boolean isLogRequestDetails() {
+		return this.logRequestDetails;
+	}
+
+	public void setLogRequestDetails(boolean logRequestDetails) {
+		this.logRequestDetails = logRequestDetails;
+	}
+
 	public boolean isLogResolvedException() {
 		return this.logResolvedException;
 	}
@@ -220,8 +235,7 @@ public class WebMvcProperties {
 
 		/**
 		 * Amount of time before asynchronous request handling times out. If this value is
-		 * not set, the default timeout of the underlying implementation is used, e.g. 10
-		 * seconds on Tomcat with Servlet 3.
+		 * not set, the default timeout of the underlying implementation is used.
 		 */
 		private Duration requestTimeout;
 
@@ -353,10 +367,14 @@ public class WebMvcProperties {
 		 */
 		private String parameterName;
 
+		@DeprecatedConfigurationProperty(
+				reason = "Use of path extensions for request mapping and for content negotiation is discouraged.")
+		@Deprecated
 		public boolean isFavorPathExtension() {
 			return this.favorPathExtension;
 		}
 
+		@Deprecated
 		public void setFavorPathExtension(boolean favorPathExtension) {
 			this.favorPathExtension = favorPathExtension;
 		}
@@ -403,18 +421,26 @@ public class WebMvcProperties {
 		 */
 		private boolean useRegisteredSuffixPattern = false;
 
+		@DeprecatedConfigurationProperty(
+				reason = "Use of path extensions for request mapping and for content negotiation is discouraged.")
+		@Deprecated
 		public boolean isUseSuffixPattern() {
 			return this.useSuffixPattern;
 		}
 
+		@Deprecated
 		public void setUseSuffixPattern(boolean useSuffixPattern) {
 			this.useSuffixPattern = useSuffixPattern;
 		}
 
+		@DeprecatedConfigurationProperty(
+				reason = "Use of path extensions for request mapping and for content negotiation is discouraged.")
+		@Deprecated
 		public boolean isUseRegisteredSuffixPattern() {
 			return this.useRegisteredSuffixPattern;
 		}
 
+		@Deprecated
 		public void setUseRegisteredSuffixPattern(boolean useRegisteredSuffixPattern) {
 			this.useRegisteredSuffixPattern = useRegisteredSuffixPattern;
 		}

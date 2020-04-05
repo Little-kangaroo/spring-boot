@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,6 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.context.properties.bind.Bindable;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
-import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.web.SpringBootMockServletContext;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -76,6 +72,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
  * @author Andy Wilkinson
  * @author Stephane Nicoll
  * @author Madhura Bhave
+ * @author Scott Frederick
  * @since 1.4.0
  * @see SpringBootTest
  */
@@ -151,7 +148,7 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 	 * @see SpringApplication#run(String...)
 	 */
 	protected String[] getArgs(MergedContextConfiguration config) {
-		return MergedAnnotations.from(config.getTestClass(), SearchStrategy.EXHAUSTIVE).get(SpringBootTest.class)
+		return MergedAnnotations.from(config.getTestClass(), SearchStrategy.TYPE_HIERARCHY).get(SpringBootTest.class)
 				.getValue("args", String[].class).orElse(NO_ARGS);
 	}
 
@@ -165,24 +162,11 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 		// JMX bean names will clash if the same bean is used in multiple contexts
 		disableJmx(properties);
 		properties.addAll(Arrays.asList(config.getPropertySourceProperties()));
-		if (!isEmbeddedWebEnvironment(config) && !hasCustomServerPort(properties)) {
-			properties.add("server.port=-1");
-		}
 		return StringUtils.toStringArray(properties);
 	}
 
 	private void disableJmx(List<String> properties) {
 		properties.add("spring.jmx.enabled=false");
-	}
-
-	private boolean hasCustomServerPort(List<String> properties) {
-		Binder binder = new Binder(convertToConfigurationPropertySource(properties));
-		return binder.bind("server.port", Bindable.of(String.class)).isBound();
-	}
-
-	private ConfigurationPropertySource convertToConfigurationPropertySource(List<String> properties) {
-		return new MapConfigurationPropertySource(
-				TestPropertySourceUtils.convertInlinedPropertiesToMap(StringUtils.toStringArray(properties)));
 	}
 
 	/**
@@ -215,7 +199,7 @@ public class SpringBootContextLoader extends AbstractContextLoader {
 	}
 
 	private boolean isEmbeddedWebEnvironment(MergedContextConfiguration config) {
-		return MergedAnnotations.from(config.getTestClass(), SearchStrategy.EXHAUSTIVE).get(SpringBootTest.class)
+		return MergedAnnotations.from(config.getTestClass(), SearchStrategy.TYPE_HIERARCHY).get(SpringBootTest.class)
 				.getValue("webEnvironment", WebEnvironment.class).orElse(WebEnvironment.NONE).isEmbedded();
 	}
 

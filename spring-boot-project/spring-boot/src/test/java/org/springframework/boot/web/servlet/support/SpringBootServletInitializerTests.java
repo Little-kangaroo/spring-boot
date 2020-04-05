@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,12 @@ class SpringBootServletInitializerTests {
 	}
 
 	@Test
+	void shutdownHookIsNotRegistered() {
+		new WithConfigurationAnnotation().createRootApplicationContext(this.servletContext);
+		assertThat(this.application).hasFieldOrPropertyWithValue("registerShutdownHook", false);
+	}
+
+	@Test
 	void errorPageFilterRegistrationCanBeDisabled() {
 		WebServer webServer = new UndertowServletWebServerFactory(0).getWebServer((servletContext) -> {
 			try (AbstractApplicationContext context = (AbstractApplicationContext) new WithErrorPageFilterNotRegistered()
@@ -129,7 +135,7 @@ class SpringBootServletInitializerTests {
 		given(servletContext.getInitParameterNames())
 				.willReturn(Collections.enumeration(Collections.singletonList("spring.profiles.active")));
 		given(servletContext.getInitParameter("spring.profiles.active")).willReturn("from-servlet-context");
-		given(servletContext.getAttributeNames()).willReturn(Collections.enumeration(Collections.emptyList()));
+		given(servletContext.getAttributeNames()).willReturn(Collections.emptyEnumeration());
 		try (ConfigurableApplicationContext context = (ConfigurableApplicationContext) new PropertySourceVerifyingSpringBootServletInitializer()
 				.createRootApplicationContext(servletContext)) {
 			assertThat(context.getEnvironment().getActiveProfiles()).containsExactly("from-servlet-context");

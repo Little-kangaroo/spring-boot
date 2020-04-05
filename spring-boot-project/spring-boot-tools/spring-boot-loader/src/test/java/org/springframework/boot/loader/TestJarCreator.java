@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ public abstract class TestJarCreator {
 	public static void createTestJar(File file, boolean unpackNested) throws Exception {
 		FileOutputStream fileOutputStream = new FileOutputStream(file);
 		try (JarOutputStream jarOutputStream = new JarOutputStream(fileOutputStream)) {
+			jarOutputStream.setComment("outer");
 			writeManifest(jarOutputStream, "j1");
 			writeEntry(jarOutputStream, "1.dat", 1);
 			writeEntry(jarOutputStream, "2.dat", 2);
@@ -88,6 +89,7 @@ public abstract class TestJarCreator {
 	private static byte[] getNestedJarData(boolean multiRelease) throws Exception {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		JarOutputStream jarOutputStream = new JarOutputStream(byteArrayOutputStream);
+		jarOutputStream.setComment("nested");
 		writeManifest(jarOutputStream, "j2", multiRelease);
 		if (multiRelease) {
 			writeEntry(jarOutputStream, "multi-release.dat", 8);
@@ -96,6 +98,7 @@ public abstract class TestJarCreator {
 			writeEntry(jarOutputStream, "META-INF/versions/11/multi-release.dat", 11);
 			writeEntry(jarOutputStream, "META-INF/versions/12/multi-release.dat", 12);
 			writeEntry(jarOutputStream, "META-INF/versions/13/multi-release.dat", 13);
+			writeEntry(jarOutputStream, "META-INF/versions/14/multi-release.dat", 14);
 		}
 		else {
 			writeEntry(jarOutputStream, "3.dat", 3);

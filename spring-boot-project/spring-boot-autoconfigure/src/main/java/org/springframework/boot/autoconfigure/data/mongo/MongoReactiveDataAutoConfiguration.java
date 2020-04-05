@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -39,6 +40,7 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.convert.NoOpDbRefResolver;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.gridfs.ReactiveGridFsOperations;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 
 /**
@@ -47,7 +49,7 @@ import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
  * <p>
  * Registers a {@link ReactiveMongoTemplate} bean if no other bean of the same type is
  * configured.
- * <P>
+ * <p>
  * Honors the {@literal spring.data.mongodb.database} property if set, otherwise connects
  * to the {@literal test} database.
  *
@@ -72,7 +74,7 @@ public class MongoReactiveDataAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(ReactiveMongoOperations.class)
 	public ReactiveMongoTemplate reactiveMongoTemplate(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory,
 			MongoConverter converter) {
 		return new ReactiveMongoTemplate(reactiveMongoDatabaseFactory, converter);
@@ -88,16 +90,16 @@ public class MongoReactiveDataAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(DataBufferFactory.class)
 	public DefaultDataBufferFactory dataBufferFactory() {
 		return new DefaultDataBufferFactory();
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
-	public ReactiveGridFsTemplate reactiveGridFsTemplate(ReactiveMongoDatabaseFactory reactiveMongoDbFactory,
+	@ConditionalOnMissingBean(ReactiveGridFsOperations.class)
+	public ReactiveGridFsTemplate reactiveGridFsTemplate(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory,
 			MappingMongoConverter mappingMongoConverter, DataBufferFactory dataBufferFactory) {
-		return new ReactiveGridFsTemplate(dataBufferFactory, reactiveMongoDbFactory, mappingMongoConverter, null);
+		return new ReactiveGridFsTemplate(dataBufferFactory, reactiveMongoDatabaseFactory, mappingMongoConverter, null);
 	}
 
 }

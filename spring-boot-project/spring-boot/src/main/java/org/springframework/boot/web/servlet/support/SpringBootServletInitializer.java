@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,10 +92,12 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		WebApplicationContext rootAppContext = createRootApplicationContext(servletContext);
 		if (rootAppContext != null) {
 			servletContext.addListener(new ContextLoaderListener(rootAppContext) {
+
 				@Override
 				public void contextInitialized(ServletContextEvent event) {
 					// no-op because the application context is already initialized
 				}
+
 			});
 		}
 		else {
@@ -119,7 +121,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		builder.listeners(new WebEnvironmentPropertySourceInitializer(servletContext));
 		SpringApplication application = builder.build();
 		if (application.getAllSources().isEmpty()
-				&& MergedAnnotations.from(getClass(), SearchStrategy.EXHAUSTIVE).isPresent(Configuration.class)) {
+				&& MergedAnnotations.from(getClass(), SearchStrategy.TYPE_HIERARCHY).isPresent(Configuration.class)) {
 			application.addPrimarySources(Collections.singleton(getClass()));
 		}
 		Assert.state(!application.getAllSources().isEmpty(),
@@ -129,6 +131,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		if (this.registerErrorPageFilter) {
 			application.addPrimarySources(Collections.singleton(ErrorPageFilterConfiguration.class));
 		}
+		application.setRegisterShutdownHook(false);
 		return run(application);
 	}
 

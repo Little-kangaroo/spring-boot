@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,6 @@ class BindableTests {
 	void toStringShouldShowDetails() {
 		Annotation annotation = AnnotationUtils.synthesizeAnnotation(TestAnnotation.class);
 		Bindable<String> bindable = Bindable.of(String.class).withExistingValue("foo").withAnnotations(annotation);
-		System.out.println(bindable.toString());
 		assertThat(bindable.toString())
 				.contains("type = java.lang.String, value = 'provided', annotations = array<Annotation>["
 						+ "@org.springframework.boot.context.properties.bind.BindableTests$TestAnnotation()]");
@@ -160,40 +159,22 @@ class BindableTests {
 		assertThat(bindable1).isEqualTo(bindable3);
 	}
 
+	@Test // gh-18218
+	void withExistingValueDoesNotForgetAnnotations() {
+		Annotation annotation = AnnotationUtils.synthesizeAnnotation(TestAnnotation.class);
+		Bindable<?> bindable = Bindable.of(String.class).withAnnotations(annotation).withExistingValue("");
+		assertThat(bindable.getAnnotations()).containsExactly(annotation);
+	}
+
+	@Test // gh-18218
+	void withSuppliedValueDoesNotForgetAnnotations() {
+		Annotation annotation = AnnotationUtils.synthesizeAnnotation(TestAnnotation.class);
+		Bindable<?> bindable = Bindable.of(String.class).withAnnotations(annotation).withSuppliedValue(() -> "");
+		assertThat(bindable.getAnnotations()).containsExactly(annotation);
+	}
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface TestAnnotation {
-
-	}
-
-	static class TestNewInstance {
-
-		private String foo = "hello world";
-
-		String getFoo() {
-			return this.foo;
-		}
-
-		void setFoo(String foo) {
-			this.foo = foo;
-		}
-
-	}
-
-	static class TestNewInstanceWithNoDefaultConstructor {
-
-		TestNewInstanceWithNoDefaultConstructor(String foo) {
-			this.foo = foo;
-		}
-
-		private String foo = "hello world";
-
-		String getFoo() {
-			return this.foo;
-		}
-
-		void setFoo(String foo) {
-			this.foo = foo;
-		}
 
 	}
 
